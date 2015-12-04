@@ -94,6 +94,15 @@ module.exports = {
         mv(path.dirname(contentsPath), finalAppPath, cb)
       })
 
+      // HACK(jeff): For some reason the previous operations make the icon readonly,
+      // subsequently breaking remote updates. Eventually fix the previous, but
+      // reset the permission for now.
+      if (opts.icon) {
+        operations.push(function(cb) {
+          fs.chmod(path.join(finalAppPath, 'Contents', 'Resources', 'atom.icns'), 33188, cb);
+        });
+      }
+
       if (opts.sign) {
         operations.push(function (cb) {
           child.exec('codesign --deep --force --sign "' + opts.sign + '" "' + finalAppPath + '"', cb)
