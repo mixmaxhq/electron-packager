@@ -59,6 +59,14 @@ module.exports = {
         appPlist.CFBundleVersion = buildVersion
       }
 
+      // HACK(jeff): Disable transport security to unbreak remote updates in El Capitan:
+      // http://ste.vn/2015/06/10/configuring-app-transport-security-ios-9-osx-10-11/
+      // We should look into whether it's possible to upgrade our servers to TLSv1.2
+      // or at the least whitelist _only_ our servers.
+      appPlist.NSAppTransportSecurity = {
+        NSAllowsArbitraryLoads: true
+      };
+
       if (opts.protocols) {
         helperPlist.CFBundleURLTypes = appPlist.CFBundleURLTypes = opts.protocols.map(function (protocol) {
           return {
